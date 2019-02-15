@@ -7,21 +7,33 @@ exports.registerUser = async (req, res, next) => {
         'Content-Type': 'application/json'
     };
 
+    const { nid, username, password } = req.body;
+    console.log(nid, username, password);
+
     const bodyData = {
         peers: ['peer0.org1.example.com', 'peer0.org2.example.com'],
         fcn: 'createUser',
-        args: ['8978', 'jenaai', 'jeni1234']
+        args: [nid, username, password]
     };
 
     try {
-        const transactionId = await axios.post(
+        const data = await axios.post(
             'http://103.84.159.230:6000/channels/mychannel/chaincodes/mycc',
             bodyData,
             { headers }
         );
-        res.send(transactionId.data);
+        console.log(data.data);
+        
+        return res.send({
+            reply: true,
+            transactionId: data.data
+        });
     } catch (e) {
-        res.status(404).send(e);
+        console.log('error occured', e);
+        return res.status(404).send({
+            reply: false,
+            error: e
+        });
     }
 };
 
