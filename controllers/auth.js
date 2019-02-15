@@ -3,9 +3,17 @@ exports.registerUser = (req, res, next) => {
     const response = {
         status: 'OK',
         result: [{
-            reply: true,
+            reply: 'true',
             nid: '10111'
         }]
     };
     res.send(response);
 };
+
+exports.loginUser = (req, res, next) => {
+    console.log(req.body);
+    res.send({
+        status: 'OK'
+    });
+};
+
