@@ -38,8 +38,8 @@ exports.registerUser = async (req, res, next) => {
 };
 
 exports.loginUser = (req, res, next) => {
-    console.log(req.body);
-    const { nid, password } = req.body;
+    console.log(req.query);
+    const { nid, password } = req.query;
     const response = {};
     if (nid === '1234' && password === 'abcdefg') {
         response.reply = true;
