@@ -19,8 +19,17 @@ exports.getAllVoters = async (req, res, next) => {
         params
     };
 
-    const response = await axios.get('http://103.84.159.230:6000/channels/mychannel/chaincodes/mycc', config);
-    const data = JSON.parse(response.data.split('=>')[1]);
-    console.log(data);
-    res.send('success');
+    try {
+        const response = await axios.get('http://103.84.159.230:6000/channels/mychannel/chaincodes/mycc', config);
+        const data = JSON.parse(response.data.split('=>')[1]);
+        console.log(data);
+        res.send({
+            data
+        });
+    } catch (e) {
+        res.status(404).send({
+            message: 'Error occured'
+        })
+    }
+    
 }
