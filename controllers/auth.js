@@ -1,11 +1,28 @@
-exports.registerUser = (req, res, next) => {
-    console.log(req.body);
-    const response = {
-        status: 'Registration Successful',
-        reply: true,
-        nid: req.body.nid
+const axios = require('axios');
+
+exports.registerUser = async (req, res, next) => {
+    const headers = {
+        authorization:
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTAyNjIwNzQsInVzZXJuYW1lIjoic2h1aGFuIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1NTAyMjYwNzR9.6BlmA0-98fZY3ZJrhaC2D075CbnDcvSQULwO5bYPJv0',
+        'Content-Type': 'application/json'
     };
-    res.send(response);
+
+    const bodyData = {
+        peers: ['peer0.org1.example.com', 'peer0.org2.example.com'],
+        fcn: 'createUser',
+        args: ['8978', 'jenaai', 'jeni1234']
+    };
+
+    try {
+        const transactionId = await axios.post(
+            'http://103.84.159.230:6000/channels/mychannel/chaincodes/mycc',
+            bodyData,
+            { headers }
+        );
+        res.send(transactionId.data);
+    } catch (e) {
+        res.status(404).send(e);
+    }
 };
 
 exports.loginUser = (req, res, next) => {
@@ -20,6 +37,5 @@ exports.loginUser = (req, res, next) => {
         response.reply = false;
         response.message = 'Authentication failed';
         res.status(400).send(response);
-    }  
+    }
 };
-
