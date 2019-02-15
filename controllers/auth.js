@@ -1,9 +1,10 @@
 const axios = require('axios');
 
+const blockchainAuthToken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTAyNzEwMTcsInVzZXJuYW1lIjoic2h1aGFuIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1NTAyMzUwMTd9.8TKKPgIFV_akPhQhKAUipBYyKByG69VXmX5EfTCCeJ8';
+
 exports.registerUser = async (req, res, next) => {
     const headers = {
-        authorization:
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTAyNjIwNzQsInVzZXJuYW1lIjoic2h1aGFuIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1NTAyMjYwNzR9.6BlmA0-98fZY3ZJrhaC2D075CbnDcvSQULwO5bYPJv0',
+        authorization: blockchainAuthToken,
         'Content-Type': 'application/json'
     };
 
@@ -37,17 +38,49 @@ exports.registerUser = async (req, res, next) => {
     }
 };
 
-exports.loginUser = (req, res, next) => {
-    console.log(req.query);
+exports.loginUser = async (req, res, next) => {
     const { nid, password } = req.query;
-    const response = {};
-    if (nid === '1234' && password === 'abcdefg') {
-        response.reply = true;
-        response.message = 'User Authenticated';
-        res.send(response);
-    } else {
-        response.reply = false;
-        response.message = 'Authentication failed';
-        res.status(400).send(response);
+    const params = {
+        peer: 'peer0.org1.example.com',
+        fcn: 'queryUser',
+        args: `["USER${nid}"]`
+    };
+
+    const headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        authorization: blockchainAuthToken
+    }
+
+    const config = {
+        headers,
+        params
+    }
+
+    try {
+        console.log('executing query');
+        const response = await axios.get('http://103.84.159.230:6000/channels/mychannel/chaincodes/mycc', config);
+        const data = JSON.parse(response.data.split('=>')[1]);
+        console.log(data);
+        
+        if (password === data.password) {
+            return res.send({
+                reply: true,
+                id: data.id,
+                username: data.name,
+                message: 'User Authenticated',
+            });
+        } else {
+            return res.status(404).send({
+                reply: false,
+                message: 'Username or password doesn\'t match'
+            })
+        }
+        
+    } catch (e) {
+        console.log('error in login', e);
+        return res.status(404).send({
+            reply: false,
+            message: 'User not found'
+        });
     }
 };
