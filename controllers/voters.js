@@ -24,6 +24,7 @@ const parseNominations = (data) => {
 
 const parseResults = (data) => {
     let list = {};
+    console.log('mydata', data);
     data.forEach((item, index) => {
         if(!list[item.Record.position]) {
             list[item.Record.position] = [];
@@ -174,7 +175,7 @@ exports.nominate = async (req, res, next) => {
     const bodyData = {
         peers: ['peer0.org1.example.com', 'peer0.org2.example.com'],
         fcn: 'nominate',
-        args: [`"${from}"`, `"${to}"`, `"${pos}"`, `"${type}"`] // 0 -> nominate
+        args: [from, to, pos, type] // 0 -> nominate
     };
 
     const headers = {
