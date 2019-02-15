@@ -113,6 +113,7 @@ const nominationHelper = async (type) => {
     }  
 };
 
+// get nomination list or vote cast list
 exports.getNominations = async (req, res, next) => {
     const { type } = req.query;
     console.log('type', type);
@@ -161,9 +162,15 @@ exports.getUser = async (req, res, next) => {
     }
 };
 
-// handles both nomination and voting
+// handles both nomination and vote casting
 exports.nominate = async (req, res, next) => {
     const { from , to , pos, type } = req.body;
+    console.log(from, to , pos, type);
+
+    if (!from || !to || !pos || !type) {
+        return res.status(404).send('error');
+    }
+
     const bodyData = {
         peers: ['peer0.org1.example.com', 'peer0.org2.example.com'],
         fcn: 'nominate',
@@ -180,10 +187,14 @@ exports.nominate = async (req, res, next) => {
         console.log(response.data);
         res.send({
             message: 'Success',
-            id: response.data
+            id: response.data,
+            reply: true
         });
     } catch (e) {
         console.log(e);
-        res.status(404).send('error');
+        res.status(404).send({
+            reply: false,
+            message: 'Error occured'
+        });
     }
 };
