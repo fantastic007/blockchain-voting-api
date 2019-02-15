@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const blockchainAuthToken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTAyNzU1NjMsInVzZXJuYW1lIjoic2h1aGFuIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1NTAyMzk1NjN9.b_kD8_Y68tl47pswrKitmzRSKoymJ558u1bz0q3Uj18';
+const blockchainAuthToken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTAyOTAxODgsInVzZXJuYW1lIjoic2h1aGFuIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1NTAyNTQxODh9.1HWB3Z5BUXqR6sryhHkydZ4t6kWnCElW21Qzx_qCdT4';
 const endpoint = 'http://103.84.159.230:6000/channels/mychannel/chaincodes/mycc';
 
 const parseNominations = (data) => {
@@ -21,6 +21,26 @@ const parseNominations = (data) => {
     }
     return list;
 }
+
+const parseResults = (data) => {
+    let list = {};
+    data.forEach((item, index) => {
+        if(!list[item.Record.position]) {
+            list[item.Record.position] = [];
+        }
+        const dataIndex = list[item.Record.position].findIndex((i) => {
+            console.log(i.id, item.Record.idto);
+            return i.id === item.Record.idto;
+        });
+
+        if (dataIndex === -1) {
+            list[item.Record.position].push({ id: item.Record.idto, count: 1});
+        } else {
+            list[item.Record.position][dataIndex].count += 1;
+        }
+    });
+    return list;
+};
 
 exports.getAllVoters = async (req, res, next) => {
     const params = {
@@ -53,11 +73,11 @@ exports.getAllVoters = async (req, res, next) => {
     }   
 }
 
-exports.getNominations = async (req, res, next) => {
+const nominationHelper = async (type) => {
     const params = {
         peer: 'peer0.org1.example.com',
         fcn: 'getNominationList',
-        args: `["0"]`
+        args: `["${type}"]`
     };
 
     const headers = {
@@ -72,15 +92,35 @@ exports.getNominations = async (req, res, next) => {
 
     try {
         const response = await axios.get(endpoint, config);
+        console.log(response.data);
         const data = JSON.parse(response.data.split('=>')[1]);
-        const list = parseNominations(data);
-        res.send({
-            data: list
-        });
+
+        if (type === 0) {
+            // get nomination list
+            const list = parseNominations(data);
+            return list;
+        } else if (type === 1) {
+            // get vote cast list
+            const list = parseResults(data);
+            return list;
+        } else {
+            return false;
+        }
+        
     } catch (e) {
         console.log(e);
-        res.status(404).send('error');
+        return false;
     }  
+};
+
+exports.getNominations = async (req, res, next) => {
+    const { type } = req.query;
+    console.log('type', type);
+    const data = await nominationHelper(parseInt(type));
+    if (!data) return res.status(404).send('error');
+    res.send({
+        data
+    });
 };
 
 exports.getUser = async (req, res, next) => {
