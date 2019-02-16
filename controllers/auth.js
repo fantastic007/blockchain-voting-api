@@ -26,15 +26,22 @@ exports.registerUser = async (req, res, next) => {
         );
         console.log(data.data);
         
-        return res.send({
-            reply: true,
-            transactionId: data.data
-        });
+        if (data.data) {
+            return res.send({
+                reply: true,
+                transactionId: data.data
+            });
+        } else {
+            return res.status(404).send({
+                reply: false,
+                message: 'User already exists'
+            })
+        }
     } catch (e) {
         console.log('error occured', e);
         return res.status(404).send({
             reply: false,
-            error: e
+            message: 'An unexpected error occured'
         });
     }
 };
@@ -47,6 +54,7 @@ exports.loginUser = async (req, res, next) => {
         args: `["USER${nid}"]`
     };
 
+    console.log(params);
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         authorization: blockchainAuthToken

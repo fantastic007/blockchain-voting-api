@@ -169,7 +169,10 @@ exports.nominate = async (req, res, next) => {
     console.log(from, to , pos, type);
 
     if (!from || !to || !pos || !type) {
-        return res.status(404).send('error');
+        return res.status(404).send({
+            reply: false,
+            error: 'Parameter error'
+        });
     }
 
     const bodyData = {
@@ -186,11 +189,19 @@ exports.nominate = async (req, res, next) => {
     try {
         const response = await axios.post(endpoint, bodyData, { headers });
         console.log(response.data);
-        res.send({
-            message: 'Success',
-            id: response.data,
-            reply: true
-        });
+        if (response.data) {
+            res.send({
+                message: 'Success',
+                id: response.data,
+                reply: true
+            });
+        } else {
+            res.status(404).send({
+                reply: false,
+                message: 'Invalid vote/nomination cast'
+            });
+        }
+        
     } catch (e) {
         console.log(e);
         res.status(404).send({
