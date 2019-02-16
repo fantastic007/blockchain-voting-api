@@ -230,3 +230,39 @@ exports.nominate = async (req, res, next) => {
         });
     }
 };
+
+// get all the candidates the user has nominated
+exports.getUserNominations = async (req, res, next) => {
+    const { nid } = req.query;
+    const params = {
+        peer: 'peer0.org1.example.com',
+        fcn: 'getNominationList',
+        args: `["0"]`
+    };
+
+    const headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        authorization: blockchainAuthToken
+    };
+
+    const config = {
+        headers,
+        params
+    };
+
+    try {
+        const response = await axios.get(endpoint, config);
+        const data = JSON.parse(response.data.split('=>')[1]);
+        const list = data.filter(item => item.Record.idfrom === nid);
+        
+        return res.send({
+            reply: true,
+            data: list
+        });
+    } catch (e) {
+        return res.status(404).send({
+            reply: false,
+            message: 'Invalid NID'
+        })
+    }
+};
