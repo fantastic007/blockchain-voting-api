@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const blockchainAuthToken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTAyOTAxODgsInVzZXJuYW1lIjoic2h1aGFuIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1NTAyNTQxODh9.1HWB3Z5BUXqR6sryhHkydZ4t6kWnCElW21Qzx_qCdT4';
+const blockchainAuthToken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTAzMjMxMDcsInVzZXJuYW1lIjoic2h1aGFuIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1NTAyODcxMDd9.-es8VySmyKgjleM5t-aOY1i62IDm3_2eNccBtUZDY4M';
 const endpoint = 'http://103.84.159.230:6000/channels/mychannel/chaincodes/mycc';
 
 exports.registerUser = async (req, res, next) => {
