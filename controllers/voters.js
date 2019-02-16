@@ -104,6 +104,9 @@ const nominationHelper = async (type) => {
             // get vote cast list
             const list = parseResults(data);
             return list;
+        } else if (type === 2) {
+            // get positions
+            return data;
         } else {
             return false;
         }
@@ -119,7 +122,10 @@ exports.getNominations = async (req, res, next) => {
     const { type } = req.query;
     console.log('type', type);
     const data = await nominationHelper(parseInt(type));
-    if (!data) return res.status(404).send('error');
+    if (!data) return res.status(404).send({
+        reply: false,
+        message: 'Invalid type supplied'
+    });
     res.send({
         data
     });
