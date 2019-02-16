@@ -117,7 +117,7 @@ const nominationHelper = async (type) => {
     }  
 };
 
-// get nomination list or vote cast list
+// get nomination list or vote cast list or positions
 exports.getNominations = async (req, res, next) => {
     const { type } = req.query;
     console.log('type', type);
@@ -175,9 +175,18 @@ exports.nominate = async (req, res, next) => {
     console.log(from, to , pos, type);
 
     if (!from || !to || !pos || !type) {
+        console.log('error in params');
         return res.status(404).send({
             reply: false,
             error: 'Parameter error'
+        });
+    }
+
+    // ignore the nominations marked as NA
+    if (parseInt(type) === 0 && to === 'NA') {
+        console.log('nomination ignored');
+        return res.send({
+            reply: true
         });
     }
 
@@ -207,6 +216,11 @@ exports.nominate = async (req, res, next) => {
                 message: 'Invalid vote/nomination cast'
             });
         }
+        // res.send({
+        //     message: 'Success',
+        //     id: response.data,
+        //     reply: true
+        // });
         
     } catch (e) {
         console.log(e);
